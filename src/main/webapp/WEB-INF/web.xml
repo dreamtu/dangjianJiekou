@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+    <display-name>ssm</display-name>
+    <!-- 默认主页-->
+    <welcome-file-list>
+        <welcome-file>/index.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- Spring和mybatis的整合配置xml文件 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring-mybatis.xml</param-value>
+    </context-param>
+    <!-- 编码过滤器 统一UTF-8 防止中文乱码问题-->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <async-supported>true</async-supported>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!--对所有的xss跨站攻击 sql注入等进行过滤转义 防御请求攻击-->
+    <filter>
+        <filter-name>XssEscape</filter-name>
+        <filter-class>com.ssm.util.filter.XssFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>XssEscape</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <!-- Spring监听器  用来启动Spring容器 web容器启动时候初始化Spring容器 从而完成Spring的加载-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!-- 防止Spring内存溢出监听器 -->
+    <listener>
+        <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+    </listener>
+
+    <!-- Spring MVC servlet 配置  DispatcherServlet控制器是Spring MVC核心控制分发servlet-->
+    <servlet>
+        <servlet-name>ssm</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <!-- Spring MVC  单独XML配置文件-->
+            <param-value>classpath:spring-mvc.xml</param-value>
+        </init-param>
+        <!--   load-on-startup 标记容器是否在启动的时候就加载这个servlet(实例化并调用其init()方法)
+               正数的值越小，该servlet的优先级越高，应用启动时就越先加载-->
+        <load-on-startup>1</load-on-startup>
+        <!--   声明Servlet是否支持异步操作模式-->
+        <async-supported>true</async-supported>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ssm</servlet-name>
+        <!-- 此处可以可以配置成*.do，对应struts的后缀习惯  Spring MVC一般不带后缀
+       拦截所有 设置为 /,例如 user/add此方法可以实现RestFul风格的url  但是此方法会导致静态文件
+       （image,js,css,font等）被拦截后不能正常显示  需要在spring-mvc.xml的mvc:resources静态资源映射-->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!--Druid启用Web监控统计功能需要在Web应用-->
+    <filter>
+        <filter-name>DruidWebStatFilter</filter-name>
+        <filter-class>com.alibaba.druid.support.http.WebStatFilter</filter-class>
+        <init-param>
+            <param-name>exclusions</param-name>
+            <param-value>*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>DruidWebStatFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!--    访问监控页面：http://ip：port/projectName/druid/index.html-->
+    <servlet>
+        <servlet-name>DruidStatView</servlet-name>
+        <servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DruidStatView</servlet-name>
+        <url-pattern>/druid/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- 设置session失效，单位分（2小时）   用户设置时间不与服务器交互，自动退出登录，销毁session-->
+    <session-config>
+        <session-timeout>120</session-timeout>
+    </session-config>
+
+    <!--配置出现400 403 404  405  500等错误的跳转默认页面-->
+    <error-page>
+        <!-- 由于语法格式有误，服务器无法理解此请求-->
+        <error-code>400</error-code>
+        <location>/html/404.html</location>
+    </error-page>
+
+    <error-page>
+        <!-- 禁止访问-->
+        <error-code>403</error-code>
+        <location>/html/404.html</location>
+    </error-page>
+    <error-page>
+        <!-- 访问路径不正确 无法找到文件 -->
+        <error-code>404</error-code>
+        <location>/html/404.html</location>
+    </error-page>
+    <error-page>
+        <!-- 没有访问权限，访问被禁止  资源被禁止-->
+        <error-code>405</error-code>
+        <location>/html/404.html</location>
+    </error-page>
+    <error-page>
+        <!-- 服务器内部错误 -->
+        <error-code>500</error-code>
+        <location>/html/404.html</location>
+    </error-page>
+
+
+</web-app>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.dao.BaseMapper">
+    <!--    默认情况下，如果全局开启了缓存，insert/update/delete成功后，会自动刷新相关的缓存项-->
+<!--    <cache></cache>-->
+    <resultMap id="pageResultMap" type="map">
+    </resultMap>
+    <!-- 公用分页存储过程调用 缓存不支持带输出参数的存储过程 所以关闭useCache="false"缓存-->
+    <select id="getPaging" statementType="CALLABLE" parameterType="map"  resultMap="pageResultMap" >
+        {call sp_com_page(
+        #{tableName,mode=IN,jdbcType=VARCHAR},#{fields,mode=IN,jdbcType=VARCHAR},#{wherecase,mode=IN,jdbcType=VARCHAR},#{pageSize,mode=IN,jdbcType=INTEGER},#{pageNow,mode=IN,jdbcType=INTEGER},#{orderField,mode=IN,jdbcType=VARCHAR},#{orderFlag,mode=IN,jdbcType=INTEGER},
+        #{myrows,mode=OUT,jdbcType=INTEGER},#{myPageCount,mode=OUT,jdbcType=INTEGER}
+        )}
+
+    </select>
+</mapper>

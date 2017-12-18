@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.ArticleMapper">
+  <resultMap id="BaseResultMap" type="com.ssm.model.Article">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="audit_flag" jdbcType="VARCHAR" property="auditFlag" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="delete_flag" jdbcType="VARCHAR" property="deleteFlag" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="cover_image_url" jdbcType="VARCHAR" property="coverImageUrl" />
+    <result column="href" jdbcType="VARCHAR" property="href" />
+    <result column="order_no" jdbcType="INTEGER" property="orderNo" />
+    <result column="publisher" jdbcType="VARCHAR" property="publisher" />
+    <result column="source_from" jdbcType="VARCHAR" property="sourceFrom" />
+    <result column="summary" jdbcType="VARCHAR" property="summary" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="column_info_id" jdbcType="VARCHAR" property="columnInfoId" />
+    <result column="is_audit" jdbcType="BIT" property="isAudit" />
+    <result column="is_top" jdbcType="BIT" property="isTop" />
+    <result column="view_count" jdbcType="INTEGER" property="viewCount" />
+    <result column="root_column_info_id" jdbcType="VARCHAR" property="rootColumnInfoId" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="mobphone" jdbcType="CHAR" property="mobphone" />
+    <result column="overall_url" jdbcType="VARCHAR" property="overallUrl" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ssm.model.Article">
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, audit_flag, create_date, delete_flag, update_date, cover_image_url, href, order_no, 
+    publisher, source_from, summary, title, column_info_id, is_audit, is_top, view_count, 
+    root_column_info_id, type, address, mobphone, overall_url
+  </sql>
+  <sql id="Blob_Column_List">
+    content
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from cms_article
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="touristByTitle" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from cms_article
+    where title like #{title,jdbcType=VARCHAR}
+  </select>
+  <select id="allTourist" resultType="map"><!--景点-->
+    select
+    <include refid="Base_Column_List" />
+    from cms_article where column_info_id='8a2a08425b7a0b7b015b7a9d0b2e000a'
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from cms_article
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.model.Article">
+    insert into cms_article (id, audit_flag, create_date, 
+      delete_flag, update_date, cover_image_url, 
+      href, order_no, publisher, 
+      source_from, summary, title, 
+      column_info_id, is_audit, is_top, 
+      view_count, root_column_info_id, type, 
+      address, mobphone, overall_url, 
+      content)
+    values (#{id,jdbcType=VARCHAR}, #{auditFlag,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{deleteFlag,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, #{coverImageUrl,jdbcType=VARCHAR}, 
+      #{href,jdbcType=VARCHAR}, #{orderNo,jdbcType=INTEGER}, #{publisher,jdbcType=VARCHAR}, 
+      #{sourceFrom,jdbcType=VARCHAR}, #{summary,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+      #{columnInfoId,jdbcType=VARCHAR}, #{isAudit,jdbcType=BIT}, #{isTop,jdbcType=BIT}, 
+      #{viewCount,jdbcType=INTEGER}, #{rootColumnInfoId,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
+      #{address,jdbcType=VARCHAR}, #{mobphone,jdbcType=CHAR}, #{overallUrl,jdbcType=VARCHAR}, 
+      #{content,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.model.Article">
+    insert into cms_article
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="auditFlag != null">
+        audit_flag,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="deleteFlag != null">
+        delete_flag,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="coverImageUrl != null">
+        cover_image_url,
+      </if>
+      <if test="href != null">
+        href,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="publisher != null">
+        publisher,
+      </if>
+      <if test="sourceFrom != null">
+        source_from,
+      </if>
+      <if test="summary != null">
+        summary,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="columnInfoId != null">
+        column_info_id,
+      </if>
+      <if test="isAudit != null">
+        is_audit,
+      </if>
+      <if test="isTop != null">
+        is_top,
+      </if>
+      <if test="viewCount != null">
+        view_count,
+      </if>
+      <if test="rootColumnInfoId != null">
+        root_column_info_id,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="mobphone != null">
+        mobphone,
+      </if>
+      <if test="overallUrl != null">
+        overall_url,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="auditFlag != null">
+        #{auditFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleteFlag != null">
+        #{deleteFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="coverImageUrl != null">
+        #{coverImageUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="href != null">
+        #{href,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=INTEGER},
+      </if>
+      <if test="publisher != null">
+        #{publisher,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceFrom != null">
+        #{sourceFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null">
+        #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="columnInfoId != null">
+        #{columnInfoId,jdbcType=VARCHAR},
+      </if>
+      <if test="isAudit != null">
+        #{isAudit,jdbcType=BIT},
+      </if>
+      <if test="isTop != null">
+        #{isTop,jdbcType=BIT},
+      </if>
+      <if test="viewCount != null">
+        #{viewCount,jdbcType=INTEGER},
+      </if>
+      <if test="rootColumnInfoId != null">
+        #{rootColumnInfoId,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="mobphone != null">
+        #{mobphone,jdbcType=CHAR},
+      </if>
+      <if test="overallUrl != null">
+        #{overallUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.model.Article">
+    update cms_article
+    <set>
+      <if test="auditFlag != null">
+        audit_flag = #{auditFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleteFlag != null">
+        delete_flag = #{deleteFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="coverImageUrl != null">
+        cover_image_url = #{coverImageUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="href != null">
+        href = #{href,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=INTEGER},
+      </if>
+      <if test="publisher != null">
+        publisher = #{publisher,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceFrom != null">
+        source_from = #{sourceFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null">
+        summary = #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="columnInfoId != null">
+        column_info_id = #{columnInfoId,jdbcType=VARCHAR},
+      </if>
+      <if test="isAudit != null">
+        is_audit = #{isAudit,jdbcType=BIT},
+      </if>
+      <if test="isTop != null">
+        is_top = #{isTop,jdbcType=BIT},
+      </if>
+      <if test="viewCount != null">
+        view_count = #{viewCount,jdbcType=INTEGER},
+      </if>
+      <if test="rootColumnInfoId != null">
+        root_column_info_id = #{rootColumnInfoId,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="mobphone != null">
+        mobphone = #{mobphone,jdbcType=CHAR},
+      </if>
+      <if test="overallUrl != null">
+        overall_url = #{overallUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ssm.model.Article">
+    update cms_article
+    set audit_flag = #{auditFlag,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      delete_flag = #{deleteFlag,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      cover_image_url = #{coverImageUrl,jdbcType=VARCHAR},
+      href = #{href,jdbcType=VARCHAR},
+      order_no = #{orderNo,jdbcType=INTEGER},
+      publisher = #{publisher,jdbcType=VARCHAR},
+      source_from = #{sourceFrom,jdbcType=VARCHAR},
+      summary = #{summary,jdbcType=VARCHAR},
+      title = #{title,jdbcType=VARCHAR},
+      column_info_id = #{columnInfoId,jdbcType=VARCHAR},
+      is_audit = #{isAudit,jdbcType=BIT},
+      is_top = #{isTop,jdbcType=BIT},
+      view_count = #{viewCount,jdbcType=INTEGER},
+      root_column_info_id = #{rootColumnInfoId,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      address = #{address,jdbcType=VARCHAR},
+      mobphone = #{mobphone,jdbcType=CHAR},
+      overall_url = #{overallUrl,jdbcType=VARCHAR},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.model.Article">
+    update cms_article
+    set audit_flag = #{auditFlag,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      delete_flag = #{deleteFlag,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      cover_image_url = #{coverImageUrl,jdbcType=VARCHAR},
+      href = #{href,jdbcType=VARCHAR},
+      order_no = #{orderNo,jdbcType=INTEGER},
+      publisher = #{publisher,jdbcType=VARCHAR},
+      source_from = #{sourceFrom,jdbcType=VARCHAR},
+      summary = #{summary,jdbcType=VARCHAR},
+      title = #{title,jdbcType=VARCHAR},
+      column_info_id = #{columnInfoId,jdbcType=VARCHAR},
+      is_audit = #{isAudit,jdbcType=BIT},
+      is_top = #{isTop,jdbcType=BIT},
+      view_count = #{viewCount,jdbcType=INTEGER},
+      root_column_info_id = #{rootColumnInfoId,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      address = #{address,jdbcType=VARCHAR},
+      mobphone = #{mobphone,jdbcType=CHAR},
+      overall_url = #{overallUrl,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

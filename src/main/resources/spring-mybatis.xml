@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Spring与Mybatis整合文件  注解扫描 事务管理  自动任务调度 数据库链接设置和动态数据源定义 AOP切面编程 扫描映射mapping.xml和接口-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!--Dao实现类 自动扫描注解@Repository   use-default-filters="false" 只扫描指定的注解 -->
+    <context:component-scan base-package="com.ssm.dao" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+
+    <!--Service实现类 自动扫描注解@Service  use-default-filters="false" 只扫描指定的注解  -->
+    <context:component-scan base-package="com.ssm.service" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+    </context:component-scan>
+
+    <!--用于公共类或实体类等其他类注入spring管理 自动扫描注解@Component  use-default-filters="false" 只扫描指定的注解  -->
+    <context:component-scan base-package="com.ssm" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+    </context:component-scan>
+
+    <!-- 引入数据库链接配置文件 jdbc.properties  可引入多个properties文件-->
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 配置动态数据源   多数据源映射关系-->
+    <bean id="dynamicDataSource"
+          class="com.ssm.util.datasource.DynamicDataSource">
+        <!-- 通过key-value的形式来关联数据源 -->
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry value-ref="dataSource" key="dataSource"></entry>
+                <!--<entry value-ref="dataSourceS" key="dataSourceS"></entry>-->
+            </map>
+        </property>
+        <!-- 配置默认主数据源  -->
+        <property name="defaultTargetDataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 动态数据源配置相同的内容(公共部分复用性) -->
+    <bean id="parentDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <!-- 初始化连接大小 -->
+        <property name="initialSize" value="${jdbc.initialSize}"></property>
+        <!-- 连接池最大数量 -->
+        <property name="maxActive" value="${jdbc.maxActive}"></property>
+        <!-- 连接池最大空闲 -->
+        <property name="maxIdle" value="${jdbc.maxIdle}"></property>
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle" value="${jdbc.minIdle}"></property>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait" value="${jdbc.maxWait}"></property>
+        <!-- 超过时间限制是否回收 -->
+        <property name="removeAbandoned" value="${jdbc.removeAbandoned}" />
+        <!-- 超过时间限制多长； -->
+        <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}" />
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}" />
+        <!-- 用来检测连接是否有效的sql，要求是一个查询语句-->
+<!--        <property name="validationQuery" value="${jdbc.validationQuery}" />-->
+        <!-- 申请连接的时候检测 -->
+        <property name="testWhileIdle" value="${jdbc.testWhileIdle}" />
+        <!-- 申请连接时执行validationQuery检测连接是否有效，配置为true会降低性能 -->
+        <property name="testOnBorrow" value="${jdbc.testOnBorrow}" />
+        <!-- 归还连接时执行validationQuery检测连接是否有效，配置为true会降低性能  -->
+        <property name="testOnReturn" value="${jdbc.testOnReturn}" />
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="${jdbc.poolPreparedStatements}" />
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="${jdbc.maxPoolPreparedStatementPerConnectionSize}" />
+        <!--属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：
+                监控统计用的filter:stat
+                日志用的filter:log4j
+               防御SQL注入的filter:wall -->
+        <property name="filters" value="${jdbc.filters}" />
+    </bean>
+
+    <!--连接池数据源druid(阿里巴巴的框架）-->
+    <!--主数据源dataSourceW-->
+    <bean id="dataSource" parent="parentDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--子从备份数据源dataSourceN-->
+    <!--<bean id="dataSourceS" parent="parentDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.urlS}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+    </bean>-->
+
+    <!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 mybatis的SQLSession工厂 不能把SqlSessionFactory设为单例 因为SqlSession是线程不安全的-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dynamicDataSource"/>
+        <!-- 自动扫描映射mapping.xml文件 -->
+        <property name="mapperLocations" value="classpath*:com/ssm/mapping/*.xml"></property>
+        <!-- 配置实体类的别名，配置实体类别名的目的是为了在映射xml(resultType="")引用实体类时可以使用实体类的别名来代替实体类，达到简写的目的 -->
+        <property name="typeAliasesPackage" value="com.ssm.model"/>
+    </bean>
+
+    <!--通过SqlSessionTemplate获取sqlSession对象-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <!-- 参数1 引入sqlSessionFactory创建SqlSessionTemplate-->
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+        <!-- 参数2    更新采用批处理模式-->
+        <constructor-arg index="1" value="BATCH"/>
+    </bean>
+
+    <!--自动扫描mapper接口 DAO接口所在包名，Spring会自动查找其下的类   创建不同的sqlsession自动注入service中-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.ssm.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+
+    <!-- 声明式事务配置开始 -->
+    <!-- 配置声明式事务管理器,使用JtaTransactionManager全局tx(声明式事务管理)  JTA全局事务
+       JTA允许应用程序执行分布式事务处理——在两个或多个数据源数据库上访问并且更新数据-->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dynamicDataSource"/>
+    </bean>
+
+
+    <!-- 配置事务管理类transactionManager的事务属性 具体的事务处理-->
+    <tx:advice id="txManager" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!--增删改方法 propagation="REQUIRED" 有事务不创建没有事务创建新事务 read-only="false"默认 事务允许修改数据-->
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="create*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="merge*" propagation="REQUIRED"/>
+            <tx:method name="modify*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="enable*" propagation="REQUIRED"/>
+            <tx:method name="disable*" propagation="REQUIRED"/>
+            <tx:method name="remove*" propagation="REQUIRED"/>
+            <tx:method name="put*" propagation="REQUIRED"/>
+            <!--查询方法 propagation="REQUIRED" 有事务不创建没有事务创建新事务 read-only="true"事务只允许读取 能提高事务的执行速度-->
+            <tx:method name="get*Paging*" propagation="REQUIRED" read-only="false"/>  <!--处理mysql分页存储过程事务-->
+            <tx:method name="get*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="search*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="count*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="find*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="list*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="*" propagation="REQUIRED" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config expose-proxy="true">
+        <!-- 只对类业务逻辑层实施事务 定义AOP事务的切入点(service层实现类的所有方法进行事务管理) -->
+        <!-- Sirvice实现类中的方法名上述定义tx:method方法的 被调用之前Spring会获取事务对象并且开启事务管理
+           方法执行成功提交事务  出现异常失败回滚事务-->
+        <aop:pointcut id="TxPointcut" expression="execution(* com.ssm.service.interfaces.*.*(..))"/>
+        <aop:advisor advice-ref="txManager" pointcut-ref="TxPointcut"/>
+    </aop:config>
+
+
+    <!-- 开启@Transactiona注解事务 只对当前配置文件有效 注解事务和上面的声明式事务只需选择其中一种，推荐用声明式事务  同时存在可以order定义先后顺序-->
+    <!-- 自动扫描的@ transactional注解  ，<tx:annotation-driven>会自动使用名称为transactionManager的事务管理器
+    @Transactional注解可以标注在类和方法上，也可以标注在定义的接口和接口方法上
+    Spring建议将@Transaction注解在Service实现类上。在方法上的@Transactional注解会覆盖掉类上的@Transactional。 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- 声明式事务配置结束 -->
+
+    <!-- 基于@AspectJ切面的驱动器 bean创建代理，织入切面 用于日志记录 异常处理 事务管理 安全权限验证 启动数据库链接等AOP面向切面的增强处理
+    有一个proxy-target-class属性，默认为false，表示使用jdk动态代理织入增强，当配为<aop:aspectj-autoproxy  poxy-target-class="true"/>时，表示使用CGLib动态代理技术织入增强。
+    不过即使proxy-target-class设置为false，如果目标类没有声明接口，则spring将自动使用CGLib动态代理。
+    区别 ：JDK动态代理是利用反射机制生成一个实现代理接口的匿名类，在调用具体方法前调用InvokeHandler来处理
+    CGLIB是针对类来生产代理，机制就是生产了一个子类，这个子类就是代理类，覆盖方法，因为是继承，所以属性和方法最好不要声明称final-->
+
+    <aop:aspectj-autoproxy/>
+
+    <!--task任务扫描注解@Scheduled  定时器开关  实现自动任务调度（定时或循环）如：定时备份数据库  每月底自动计算任务等  定时器的任务方法不能有返回值-->
+    <task:annotation-driven/>
+
+</beans>
