@@ -5,15 +5,9 @@ import com.ssm.dao.ArticleMapper;
 import com.ssm.dao.BaseMapper;
 import com.ssm.model.Article;
 import com.ssm.service.interfaces.ITestService;
-import com.ssm.util.CommonUtil;
-import com.ssm.util.SysConstants;
-import com.ssm.util.datasource.DataSource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,8 +52,8 @@ public class TestServiceImpl implements ITestService {
     //根据景点名称获取景点数据
     @Override
     public Article touristByTitle(String title){
-        Article tourist = articleMapper.touristByTitle(title);
-        return tourist;
+        Article article = articleMapper.touristByTitle(title);
+        return article;
     }
 
     //获取所有景点数据

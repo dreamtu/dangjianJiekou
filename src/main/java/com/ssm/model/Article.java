@@ -45,6 +45,10 @@ public class Article {
 
     private String overallUrl;
 
+    private String meituanUrl;
+
+    private Date createtime;
+
     private String content;
 
     public String getId() {
@@ -213,6 +217,22 @@ public class Article {
 
     public void setOverallUrl(String overallUrl) {
         this.overallUrl = overallUrl == null ? null : overallUrl.trim();
+    }
+
+    public String getMeituanUrl() {
+        return meituanUrl;
+    }
+
+    public void setMeituanUrl(String meituanUrl) {
+        this.meituanUrl = meituanUrl == null ? null : meituanUrl.trim();
+    }
+
+    public Date getCreatetime() {
+        return createtime;
+    }
+
+    public void setCreatetime(Date createtime) {
+        this.createtime = createtime;
     }
 
     public String getContent() {
