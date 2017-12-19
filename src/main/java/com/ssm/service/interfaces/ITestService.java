@@ -20,4 +20,6 @@ public interface ITestService {
 
     List getAllTourist();//获取所有景点
 
+    List getAllCountry();//获取所有乡村
+
 }

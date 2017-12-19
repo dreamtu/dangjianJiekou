@@ -51,6 +51,12 @@ public class TestController {
         return testService.getAllTourist();
     }
 
+    //获取所有乡村
+    @RequestMapping(value = "/countryList", method = RequestMethod.GET)
+    public List countryList() {
+        return testService.getAllCountry();
+    }
+
     //根据景点名称获取景点
     @RequestMapping(value = "/touristByTitle/{title}", method = RequestMethod.GET)
     public Article touristByTitle(@PathVariable("title") String title) {

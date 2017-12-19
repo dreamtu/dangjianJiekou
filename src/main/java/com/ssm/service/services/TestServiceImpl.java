@@ -59,9 +59,13 @@ public class TestServiceImpl implements ITestService {
     //获取所有景点数据
     @Override
     public List getAllTourist() {
-//        return touristMapper.allTourist();
         return articleMapper.allTourist();
     }
 
+    //获取所有乡村数据
+    @Override
+    public List getAllCountry() {
+        return articleMapper.allCountry();
+    }
 
 }

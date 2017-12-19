@@ -20,5 +20,8 @@ public interface ArticleMapper {
     int updateByPrimaryKey(Article record);
 
     List allTourist();//获取所有景点数据
+
+    List allCountry();//获取所有乡村数据
+
     Article touristByTitle(String title);//根据景点名称获取景点数据
 }
