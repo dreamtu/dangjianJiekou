@@ -55,21 +55,17 @@
   </select>
   <select id="allTourist" resultType="map"><!--景点-->
     select
-    id, delete_flag, update_date, cover_image_url, href, order_no,
-    publisher, source_from, summary, title, column_info_id, view_count,
+    id, delete_flag, cover_image_url, href, order_no,title, column_info_id, view_count,
     type, address, mobphone, overall_url, meituan_url, createtime
     from cms_article where column_info_id='8a2a08425b7a0b7b015b7a9d0b2e000a'
     order by type asc
   </select>
-  <select id="allCountry" resultType="map"><!--乡村-->
+  <select id="allFood" resultType="map"><!--美食-->
     select
-    id, delete_flag, update_date, cover_image_url, href, order_no,
-    publisher, source_from, summary, title, column_info_id, view_count,
-    type, address, mobphone, overall_url, meituan_url, createtime
+    id,  title, cover_image_url,content,type
     from cms_article where column_info_id='402881a560686567016068741eb50003'
-
+    order by type asc
   </select>
-
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from cms_article
